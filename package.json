@@ -19,8 +19,8 @@
     "request-promise": "^4.2.4"
   },
   "scripts": {
-    "start": "node authorization_code/app.js",
-    "server": "babel-node authorization_code/app.js",
+    "start": "node src/app.js",
+    "server": "babel-node src/app.js",
     "dev": "NODE_ENV=development yarn server"
   }
 }
