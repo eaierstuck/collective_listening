@@ -1,14 +1,3 @@
-
-export const renderOauthInfo = (accessToken, refreshToken) => {
-  const oauthSource = document.getElementById('oauth-template').innerHTML
-  const oauthTemplate = Handlebars.compile(oauthSource)
-  const oauthPlaceholder = document.getElementById('oauth')
-  oauthPlaceholder.innerHTML = oauthTemplate({
-    access_token: accessToken,
-    refresh_token: refreshToken
-  })
-}
-
 export const renderUserInfo = (response) => {
   const userProfileSource = document.getElementById('user-profile-template').innerHTML
   const userProfileTemplate = Handlebars.compile(userProfileSource)
