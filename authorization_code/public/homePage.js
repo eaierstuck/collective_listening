@@ -1,4 +1,6 @@
-import {renderPlaylistsInfo, renderUserInfo, renderOauthInfo} from './handlebarUtils.js'
+import {renderUserInfo, renderOauthInfo} from './handlebarUtils.js'
+import {getPlaylists} from './playlists.js'
+import {getHashParams} from './webUtils.js'
 
 const displayHomePage = () => {
 
@@ -45,29 +47,6 @@ const displayHomePage = () => {
       })
     }, false)
   }
-}
-
-function getHashParams() {
-  let hashParams = {}
-  let e, r = /([^&;=]+)=?([^&;]*)/g,
-    q = window.location.hash.substring(1)
-  while ( e = r.exec(q)) {
-    hashParams[e[1]] = decodeURIComponent(e[2]);
-  }
-  return hashParams
-}
-
-function getPlaylists(userId, accessToken) {
-  $.ajax({
-    url: `https://api.spotify.com/v1/users/${userId}/playlists`,
-    headers: {
-      'Authorization': 'Bearer ' + accessToken
-    },
-    success: (response) => {
-      renderPlaylistsInfo(response)
-      console.log(response)
-    }
-  })
 }
 
 displayHomePage()

@@ -1,3 +1,4 @@
+
 export const renderOauthInfo = (accessToken, refreshToken) => {
   const oauthSource = document.getElementById('oauth-template').innerHTML
   const oauthTemplate = Handlebars.compile(oauthSource)
@@ -16,7 +17,7 @@ export const renderUserInfo = (response) => {
   userProfilePlaceholder.innerHTML = userProfileTemplate(response)
 }
 
-export const renderPlaylistsInfo = (response) => {
+export const renderPlaylists = (response) => {
   const playlistsSource = document.getElementById('playlists-template').innerHTML
   const playlistsTemplate = Handlebars.compile(playlistsSource)
   const playlistsPlaceholder = document.getElementById('playlists')
@@ -24,11 +25,28 @@ export const renderPlaylistsInfo = (response) => {
   playlistsPlaceholder.innerHTML = playlistsTemplate(response)
 }
 
-Handlebars.registerHelper('list', (items, options) => {
-  let out = "<ul>"
+export const renderPlaylistTracks = (response) => {
+  const playlistTracksSource = document.getElementById('playlist-tracks-template').innerHTML
+  const playlistTracksTemplate = Handlebars.compile(playlistTracksSource)
+  const playlistTracksPlaceholder = document.getElementById('playlist-tracks')
 
-  for(let i=0, l=items.length; i<l; i++) {
-    out = out + "<li>" + options.fn(items[i]) + "</li>"
+  playlistTracksPlaceholder.innerHTML = playlistTracksTemplate(response)
+
+  const playlistsPlaceholder = document.getElementById('playlists')
+
+  playlistsPlaceholder.style.display = 'none'
+  playlistTracksPlaceholder.style.display = 'block'
+}
+
+Handlebars.registerHelper('list', (items, listId, options) => {
+  console.log("items ", items)
+  let out = `<ul id=${listId} class='list-group list-group-flush'>`
+
+  for(let i=0; i<items.length; i++) {
+    const item = items[i]
+    out = out + `<li class="btn-link list-group-item" id="${listId}-${item.id}">`
+    out = out + options.fn(item)
+    out = out + "</li>"
   }
 
   return out + "</ul>"
