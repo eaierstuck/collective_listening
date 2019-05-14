@@ -11,9 +11,16 @@
     "request": "~2.83.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.4",
+    "@babel/node": "^7.2.2",
+    "@babel/preset-env": "^7.4.4",
+    "handlebars": "^4.1.2",
     "request-promise": "^4.2.4"
   },
   "scripts": {
-    "start": "node authorization_code/app.js"
+    "start": "node authorization_code/app.js",
+    "server": "babel-node authorization_code/app.js",
+    "dev": "NODE_ENV=development yarn server"
   }
 }
