@@ -32,12 +32,12 @@
 
     <script id="playlists-template" type="text/x-handlebars-template">
       <h2>Playlists</h2>
-      {{#list items "playlists-list"}} {{name}} {{/list}}
+      {{#playlist-list items}} {{name}} {{/playlist-list}}
     </script>
 
     <script id="playlist-tracks-template" type="text/x-handlebars-template">
       <h2>{{name}}</h2>
-      {{#list tracks "playlist-tracks-list"}} {{name}} {{/list}}
+      {{#tracks-list tracks}} {{name}} {{/tracks-list}}
     </script>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>

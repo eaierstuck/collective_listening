@@ -27,13 +27,26 @@ export const renderPlaylistTracks = (response) => {
   playlistTracksPlaceholder.style.display = 'block'
 }
 
-Handlebars.registerHelper('list', (items, listId, options) => {
-  console.log("items ", items)
-  let out = `<ul id=${listId} class='list-group list-group-flush'>`
+Handlebars.registerHelper('playlist-list', (items, options) => {
+  let out = `<ul id="playlists-list" class='list-group list-group-flush'>`
 
   for(let i=0; i<items.length; i++) {
     const item = items[i]
-    out = out + `<li class="btn-link list-group-item" id="${listId}-${item.id}">`
+    out = out + `<li class="btn-link list-group-item" id="playlist-${item.id}">`
+    out = out + options.fn(item)
+    out = out + "</li>"
+  }
+
+  return out + "</ul>"
+})
+
+Handlebars.registerHelper('tracks-list', (items, options) => {
+  let out = `<ul id='tracks' class='list-group list-group-flush'>`
+
+  for(let i=0; i<items.length; i++) {
+    const item = items[i]
+    out = out + `<li class="btn-link list-group-item">`
+    out = out + `<button class='btn btn-success play-pause' id='track-${item.id}'>Play</button>`
     out = out + options.fn(item)
     out = out + "</li>"
   }
