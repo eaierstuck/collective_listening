@@ -23,7 +23,7 @@ const displayHomePage = () => {
           $('#login').hide()
           $('#loggedin').show()
 
-          getPlaylists(response["id"], accessToken)
+          getPlaylists(response["id"])
         }
       })
     } else {

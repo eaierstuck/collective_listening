@@ -1,19 +1,20 @@
 import {renderPlaylists, renderPlaylistTracks} from './handlebarUtils.js'
+import {getHashParams} from './webUtils.js'
 
-export function getPlaylists(userId, accessToken) {
+export function getPlaylists(userId) {
   $.ajax({
     url: `https://api.spotify.com/v1/users/${userId}/playlists`,
     headers: {
-      'Authorization': 'Bearer ' + accessToken
+      'Authorization': 'Bearer ' + accessToken()
     },
     success: (response) => {
       renderPlaylists(response)
-      setUpPlaylists(accessToken)
+      setUpPlaylists()
     }
   })
 }
 
-function setUpPlaylists(accessToken) {
+function setUpPlaylists() {
   const playlistElements = document.querySelectorAll('#playlists-list li')
   for (const el of playlistElements) {
     el.addEventListener('click', (event) => {
@@ -22,35 +23,34 @@ function setUpPlaylists(accessToken) {
       $.ajax({
         url: `https://api.spotify.com/v1/playlists/${playlistId}`,
         headers: {
-          'Authorization': 'Bearer ' + accessToken
+          'Authorization': 'Bearer ' + accessToken()
         },
         success: (response) => {
           const tracks = response.tracks.items.map((item) => item.track);
           response.tracks = tracks;
           renderPlaylistTracks(response)
-          setUpPlaylistTracks(accessToken)
+          setUpPlaylistTracks()
         }
       })
     })
   }
 }
 
-function setUpPlaylistTracks(accessToken) {
+function setUpPlaylistTracks() {
   const playButtons = document.querySelectorAll('.play-pause')
   for (const el of playButtons) {
     el.addEventListener('click', (event) => {
-      const trackId = event.target['id'].substring('track-'.length)
-
       if (event.target['classList'].contains('btn-success')) {
-        playTrack(trackId, accessToken, el)
+        playTrack(event)
       } else if (event.target['classList'].contains('btn-danger')) {
-        pauseTrack(accessToken, el)
+        pauseTrack(event)
       }
     })
   }
 }
 
-function playTrack(trackId, accessToken, el) {
+function playTrack(event) {
+  const trackId = event.target['id'].substring('track-'.length)
   $.ajax({
     url: `https://api.spotify.com/v1/me/player/play`,
     type: 'PUT',
@@ -58,32 +58,31 @@ function playTrack(trackId, accessToken, el) {
       uris: [`spotify:track:${trackId}`]
     }),
     headers: {
-      'Authorization': 'Bearer ' + accessToken
+      'Authorization': 'Bearer ' + accessToken()
     },
     success: () => {
-      el.classList.remove('btn-success')
-      el.classList.add('btn-danger')
-      el.innerText = "Pause"
+      event.target.classList.replace('btn-success', 'btn-danger')
+      event.target.innerText = "Pause"
     },
     error: () => {
-      activateDevices(trackId, accessToken, el)
+      activateDevices(event)
     }
   })
 }
 
-function activateDevices(trackId, accessToken, el) {
+function activateDevices(event) {
   $.ajax({
     url: `https://api.spotify.com/v1/me/player/devices`,
     headers: {
-      'Authorization': 'Bearer ' + accessToken
+      'Authorization': 'Bearer ' + accessToken()
     },
     async: false,
     success: (response) => {
       const phones = response.devices.filter(d => d.type === "Smartphone")
       if (phones.length > 0) {
-        transferPlayback(trackId, accessToken, phones[0].id, el)
+        transferPlayback(event, phones[0].id)
       } else if (response.devices.length > 0) {
-        transferPlayback(trackId, accessToken, response.devices[0].id, el)
+        transferPlayback(event, response.devices[0].id)
       } else {
         alert('open spotify app!')
       }
@@ -91,7 +90,7 @@ function activateDevices(trackId, accessToken, el) {
   })
 }
 
-function transferPlayback(trackId, accessToken, deviceId, el) {
+function transferPlayback(event, deviceId) {
   $.ajax({
     url: `https://api.spotify.com/v1/me/player`,
     type: 'PUT',
@@ -99,25 +98,29 @@ function transferPlayback(trackId, accessToken, deviceId, el) {
       device_ids: [deviceId]
     }),
     headers: {
-      'Authorization': 'Bearer ' + accessToken
+      'Authorization': 'Bearer ' + accessToken()
     },
     success: () => {
-      playTrack(trackId, accessToken, el)
+      playTrack(event)
     }
   })
 }
 
-function pauseTrack(accessToken, el) {
+function pauseTrack(event) {
   $.ajax({
     url: `https://api.spotify.com/v1/me/player/pause`,
     type: 'PUT',
     headers: {
-      'Authorization': 'Bearer ' + accessToken
+      'Authorization': 'Bearer ' + accessToken()
     },
     success: () => {
-      el.classList.remove('btn-danger')
-      el.classList.add('btn-success')
-      el.innerText = "Play"
+      event.target.classList.replace('btn-danger', 'btn-success')
+      event.target.innerText = "Play"
     }
   })
+}
+
+const accessToken = () => {
+  const params = getHashParams()
+  return params.access_token
 }
