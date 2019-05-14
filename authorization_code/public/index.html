@@ -28,6 +28,7 @@
         <div id="oauth">
         </div>
         <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
+        <div id="playlists"></div>
       </div>
     </div>
 
@@ -59,6 +60,11 @@
       </dl>
     </script>
 
+    <script id="playlists-template" type="text/x-handlebars-template">
+      <h2>Playlists</h2>
+      {{#list items}}{{name}}{{/list}}
+    </script>
+
     <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script>
@@ -76,6 +82,33 @@
              hashParams[e[1]] = decodeURIComponent(e[2]);
           }
           return hashParams;
+        }
+
+        Handlebars.registerHelper('list', function(items, options) {
+          var out = "<ul>";
+
+          for(var i=0, l=items.length; i<l; i++) {
+            out = out + "<li>" + options.fn(items[i]) + "</li>";
+          }
+
+          return out + "</ul>";
+        });
+
+        function getPlaylists(userId, accessToken) {
+          $.ajax({
+            url: `https://api.spotify.com/v1/users/${userId}/playlists`,
+            headers: {
+              'Authorization': 'Bearer ' + accessToken
+            },
+            success: function(response) {
+              var playlistsSource = document.getElementById('playlists-template').innerHTML,
+                  playlistsTemplate = Handlebars.compile(playlistsSource),
+                  playlistsPlaceholder = document.getElementById('playlists');
+
+              playlistsPlaceholder.innerHTML = playlistsTemplate(response);
+              console.log(response)
+            }
+          })
         }
 
         var userProfileSource = document.getElementById('user-profile-template').innerHTML,
@@ -108,10 +141,13 @@
                   'Authorization': 'Bearer ' + access_token
                 },
                 success: function(response) {
+                  userId = response["id"];
                   userProfilePlaceholder.innerHTML = userProfileTemplate(response);
 
                   $('#login').hide();
                   $('#loggedin').show();
+
+                  getPlaylists(userId, access_token);
                 }
             });
           } else {
