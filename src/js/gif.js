@@ -1,5 +1,6 @@
 export default class Gif {
-  constructor(url, danceability) {
+  constructor({description = "", url = "", danceability = 0}) {
+    this.description = description
     this.url = url
     this.danceability = danceability
   }

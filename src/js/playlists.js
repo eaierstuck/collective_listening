@@ -41,9 +41,10 @@ function setUpPlaylistTracks() {
   for (const el of playButtons) {
     el.addEventListener('click', (event) => {
       if (event.target['classList'].contains('btn-success')) {
-        playTrack(event)
+        const trackId = event.target['id'].substring('track-'.length)
+        playTrack(trackId, event.target)
       } else if (event.target['classList'].contains('btn-danger')) {
-        pauseTrack(event)
+        pauseTrack(event.target)
       }
     })
   }
@@ -54,8 +55,9 @@ function setUpPlaylistTracks() {
   })
 }
 
-function playTrack(event) {
-  const trackId = event.target['id'].substring('track-'.length)
+function playTrack(trackId, btnElement) {
+  pauseCurrentlyPlaying()
+
   $.ajax({
     url: `https://api.spotify.com/v1/me/player/play`,
     type: 'PUT',
@@ -66,13 +68,20 @@ function playTrack(event) {
       'Authorization': 'Bearer ' + accessToken()
     },
     success: () => {
-      event.target.classList.replace('btn-success', 'btn-danger')
-      event.target.innerText = "Pause"
+      btnElement.classList.replace('btn-success', 'btn-danger')
+      btnElement.innerText = "Pause"
       dance(trackId)
     },
     error: () => {
       activateDevices(event)
     }
+  })
+}
+
+function pauseCurrentlyPlaying() {
+  const currentlyPlaying = document.querySelectorAll('.btn-danger')
+  currentlyPlaying.forEach(btn => {
+    pauseTrack(btn)
   })
 }
 
@@ -126,7 +135,7 @@ function transferPlayback(event, deviceId) {
   })
 }
 
-function pauseTrack(event) {
+function pauseTrack(btnElement) {
   $.ajax({
     url: `https://api.spotify.com/v1/me/player/pause`,
     type: 'PUT',
@@ -134,8 +143,8 @@ function pauseTrack(event) {
       'Authorization': 'Bearer ' + accessToken()
     },
     success: () => {
-      event.target.classList.replace('btn-danger', 'btn-success')
-      event.target.innerText = "Play"
+      btnElement.classList.replace('btn-danger', 'btn-success')
+      btnElement.innerText = "Play"
       $('#dancing-gif').hide()
     }
   })
