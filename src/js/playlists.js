@@ -1,5 +1,6 @@
 import {renderPlaylists, renderPlaylistTracks} from './handlebarUtils.js'
 import {getHashParams} from './webUtils.js'
+import calculateGif from './gifs'
 
 export function getPlaylists(userId) {
   $.ajax({
@@ -67,9 +68,24 @@ function playTrack(event) {
     success: () => {
       event.target.classList.replace('btn-success', 'btn-danger')
       event.target.innerText = "Pause"
+      dance(trackId)
     },
     error: () => {
       activateDevices(event)
+    }
+  })
+}
+
+function dance(trackId) {
+  $.ajax({
+    url: `https://api.spotify.com/v1/audio-features/${trackId}`,
+    headers: {
+      'Authorization': 'Bearer ' + accessToken()
+    },
+    success: (response) => {
+      const gif = calculateGif(response)
+      $('#dancing-gif').show()
+      $('#dancing-gif').attr("src", gif.url)
     }
   })
 }
@@ -120,6 +136,7 @@ function pauseTrack(event) {
     success: () => {
       event.target.classList.replace('btn-danger', 'btn-success')
       event.target.innerText = "Play"
+      $('#dancing-gif').hide()
     }
   })
 }
