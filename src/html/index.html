@@ -5,7 +5,7 @@
     <title>Collective Listening</title>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <style type="text/css">
-      #login, #loggedin, #playlist-tracks {
+      #login, #loggedin {
         display: none;
       }
     </style>
@@ -18,10 +18,9 @@
         <a href="/login" class="btn btn-primary">Log in with Spotify</a>
       </div>
       <div id="loggedin">
-        <div id="user-profile">
-        </div>
-        <div id="playlists"></div>
-        <div id="playlist-tracks"></div>
+        <section id="user-profile" class="home-page-section"></section>
+        <section id="playlists" class="home-page-section"></section>
+        <section id="playlist-tracks" class="home-page-section"></section>
       </div>
     </div>
 
