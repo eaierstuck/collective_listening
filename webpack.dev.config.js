@@ -1,16 +1,17 @@
 const path = require('path')
 const webpack = require('webpack')
-const nodeExternals = require('webpack-node-externals')
 const HtmlWebPackPlugin = require("html-webpack-plugin")
+
 module.exports = {
   entry: {
-    main: './src/index.js',
+    main: './src/index.js'
   },
   output: {
     path: path.join(__dirname, 'dist'),
     publicPath: '/',
     filename: '[name].js'
   },
+  mode: 'development',
   target: 'web',
   devtool: 'source-map',
   module: {
@@ -46,6 +47,7 @@ module.exports = {
       template: "./src/html/index.html",
       filename: "./index.html",
       excludeChunks: [ 'server' ]
-    })
+    }),
+    new webpack.NoEmitOnErrorsPlugin()
   ]
 }

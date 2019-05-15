@@ -14,6 +14,9 @@ import querystring from 'querystring'
 import cookieParser from 'cookie-parser'
 import {generateRandomString} from './stringUtils'
 import path from 'path'
+import webpack from 'webpack'
+import webpackDevMiddleware from 'webpack-dev-middleware'
+import config from '../../webpack.dev.config.js'
 
 const client_id = '3ed0a5d64f864489b1e522a0f5e26ee7' // Your client id
 const client_secret = '545f9222eaf24c61877c92cf10541414' // Your secret
@@ -22,15 +25,26 @@ const redirect_uri = 'http://localhost:8888/callback' // Your redirect uri
 const stateKey = 'spotify_auth_state'
 
 const app = express()
-const DIST_DIR = path.join(__dirname)
+const DIST_DIR = __dirname
 const HTML_FILE = path.join(DIST_DIR, 'index.html')
+const compiler = webpack(config)
 
-app.use(express.static(DIST_DIR))
-   .use(cors())
+app.use(webpackDevMiddleware(compiler, {
+  publicPath: config.output.publicPath
+}))
+
+app.use(cors())
    .use(cookieParser())
 
-app.get('/', (req, res) => {
-  res.sendFile(HTML_FILE)
+app.get('/', (req, res, next) => {
+  compiler.outputFileSystem.readFile(HTML_FILE, (err, result) => {
+    if (err) {
+      return next(err)
+    }
+    res.set('content-type', 'text/html')
+    res.send(result)
+    res.end()
+  })
 })
 
 app.get('/login', function(req, res) {
@@ -112,5 +126,8 @@ app.get('/callback', (req, res) => {
   }
 })
 
-console.log('Listening on 8888')
-app.listen(8888)
+const PORT = process.env.PORT || 8888
+app.listen(PORT, () => {
+    console.log(`App listening to ${PORT}....`)
+    console.log('Press Ctrl+C to quit.')
+})
