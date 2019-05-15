@@ -7,12 +7,13 @@
  * https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
  */
 import express from 'express'
-import request from 'request' // "Request" library
+import request from 'request'
 import requestPromise from 'request-promise'
 import cors from 'cors'
 import querystring from 'querystring'
 import cookieParser from 'cookie-parser'
 import {generateRandomString} from './stringUtils'
+import path from 'path'
 
 const client_id = '3ed0a5d64f864489b1e522a0f5e26ee7' // Your client id
 const client_secret = '545f9222eaf24c61877c92cf10541414' // Your secret
@@ -21,10 +22,16 @@ const redirect_uri = 'http://localhost:8888/callback' // Your redirect uri
 const stateKey = 'spotify_auth_state'
 
 const app = express()
+const DIST_DIR = path.join(__dirname)
+const HTML_FILE = path.join(DIST_DIR, 'index.html')
 
-app.use(express.static(__dirname + '/public'))
+app.use(express.static(DIST_DIR))
    .use(cors())
    .use(cookieParser())
+
+app.get('/', (req, res) => {
+  res.sendFile(HTML_FILE)
+})
 
 app.get('/login', function(req, res) {
 

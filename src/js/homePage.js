@@ -2,7 +2,7 @@ import {renderUserInfo} from './handlebarUtils.js'
 import {getPlaylists} from './playlists.js'
 import {getHashParams} from './webUtils.js'
 
-const displayHomePage = () => {
+export const displayHomePage = () => {
 
   const params = getHashParams()
   let accessToken = params.access_token,
@@ -33,5 +33,3 @@ const displayHomePage = () => {
     }
   }
 }
-
-displayHomePage()
