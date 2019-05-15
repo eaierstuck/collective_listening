@@ -26,8 +26,7 @@ function setUpPlaylists() {
           'Authorization': 'Bearer ' + accessToken()
         },
         success: (response) => {
-          const tracks = response.tracks.items.map((item) => item.track);
-          response.tracks = tracks;
+          response.tracks = response.tracks.items.map((item) => item.track);
           renderPlaylistTracks(response)
           setUpPlaylistTracks()
         }
@@ -47,6 +46,11 @@ function setUpPlaylistTracks() {
       }
     })
   }
+
+  document.getElementById('back-to-playlists').addEventListener('click', () => {
+    $('#playlist-tracks').hide()
+    $('#playlists').show()
+  })
 }
 
 function playTrack(event) {
