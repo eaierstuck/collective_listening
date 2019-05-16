@@ -5,9 +5,9 @@ import request from 'request'
 import path from 'path'
 
 const stateKey = 'spotify_auth_state'
-const client_id = '3ed0a5d64f864489b1e522a0f5e26ee7' // Your client id
-const client_secret = '545f9222eaf24c61877c92cf10541414' // Your secret
-const redirect_uri = 'http://localhost:8888/callback' // Your redirect uri
+const redirectUri = 'http://localhost:8888/callback' // Your redirect uri
+const clientId = process.env.CLIENT_ID
+const clientSecret = process.env.CLIENT_SECRET
 
 const DIST_DIR = __dirname
 const HTML_FILE = path.join(DIST_DIR, 'index.html')
@@ -34,9 +34,9 @@ export const addRoutes = (app, compiler) => {
     res.redirect('https://accounts.spotify.com/authorize?' +
       querystring.stringify({
         response_type: 'code',
-        client_id: client_id,
+        client_id: clientId,
         scope: scope,
-        redirect_uri: redirect_uri,
+        redirect_uri: redirectUri,
         state: state
       }))
   })
@@ -61,11 +61,11 @@ export const addRoutes = (app, compiler) => {
         url: 'https://accounts.spotify.com/api/token',
         form: {
           code: code,
-          redirect_uri: redirect_uri,
+          redirect_uri: redirectUri,
           grant_type: 'authorization_code'
         },
         headers: {
-          'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
+          'Authorization': 'Basic ' + (new Buffer(clientId + ':' + clientSecret).toString('base64'))
         },
         json: true
       }
@@ -73,12 +73,12 @@ export const addRoutes = (app, compiler) => {
       requestPromise.post(authOptions, (error, response, body) => {
         if (!error && response.statusCode === 200) {
 
-          const access_token = body.access_token,
-            refresh_token = body.refresh_token
+          const accessToken = body.access_token,
+            refreshToken = body.refresh_token
 
           const options = {
             url: 'https://api.spotify.com/v1/me',
-            headers: { 'Authorization': 'Bearer ' + access_token },
+            headers: { 'Authorization': 'Bearer ' + accessToken },
             json: true
           }
 
@@ -90,8 +90,8 @@ export const addRoutes = (app, compiler) => {
           // we can also pass the token to the browser to make requests from there
           res.redirect('/#' +
             querystring.stringify({
-              access_token: access_token,
-              refresh_token: refresh_token
+              access_token: accessToken,
+              refresh_token: refreshToken
             }))
         } else {
           res.redirect('/#' +
