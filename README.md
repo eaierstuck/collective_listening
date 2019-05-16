@@ -1,5 +1,5 @@
 # Collective Listening
 
-- Step 1: Integrate with your spotify account
+- Step 1: Login to spotify
 - Step 2: Dance!
 
