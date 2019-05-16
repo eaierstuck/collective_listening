@@ -39,7 +39,8 @@
   "scripts": {
     "buildDev": "rm -rf dist && webpack --mode development --config webpack.server.config.js && webpack --mode development --config webpack.dev.config.js",
     "buildProd": "rm -rf dist && webpack --mode production --config webpack.server.config.js && webpack --mode production --config webpack.prod.config.js",
-    "start": "node -r dotenv/config ./dist/server.js",
-    "startDev": "yarn buildDev && yarn start"
+    "startDev": "yarn buildDev && node -r dotenv/config ./dist/server.js",
+    "start": "node ./dist/server.js",
+    "heroku-postbuild": "yarn buildProd"
   }
 }
