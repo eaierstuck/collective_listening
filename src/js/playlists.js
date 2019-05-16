@@ -1,6 +1,7 @@
 import {renderPlaylists, renderPlaylistTracks} from './handlebarUtils.js'
 import {getHashParams} from './webUtils.js'
 import calculateGif from './gifs'
+import $ from 'jquery'
 
 export function getPlaylists(userId) {
   $.ajax({

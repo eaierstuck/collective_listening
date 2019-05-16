@@ -1,6 +1,7 @@
 import {renderUserInfo} from './handlebarUtils.js'
 import {getPlaylists} from './playlists.js'
 import {getHashParams} from './webUtils.js'
+import $ from 'jquery'
 import '../styles/homePage.scss'
 
 export const displayHomePage = () => {
