@@ -15,5 +15,7 @@ app.use(express.static(path.join(__dirname)))
 
 addRoutes(app, compiler)
 
-console.log('Listening on 8888')
-app.listen(8888)
+const PORT = process.env.PORT || 8888
+app.listen(PORT, () => {
+  console.log(`App listening to ${PORT}....`)
+})
