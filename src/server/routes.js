@@ -5,7 +5,7 @@ import request from 'request'
 import path from 'path'
 
 const stateKey = 'spotify_auth_state'
-const redirectUri = 'http://localhost:8888/callback' // Your redirect uri
+const redirectUri = process.env.ROOT_URL + '/callback' // Your redirect uri
 const clientId = process.env.CLIENT_ID
 const clientSecret = process.env.CLIENT_SECRET
 
