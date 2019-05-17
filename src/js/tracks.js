@@ -5,14 +5,14 @@ import {accessToken} from './webUtils'
 export function playTrack(trackId, btnElement) {
   pauseCurrentlyPlaying()
 
-  findChorusStart(trackId).then((chorusStart) => {
-    console.log(chorusStart)
+  performAudioAnalysis(trackId).then((analysisResponse) => {
+    const chorus = findChorus(analysisResponse)
     $.ajax({
       url: `https://api.spotify.com/v1/me/player/play`,
       type: 'PUT',
       data: JSON.stringify({
         uris: [`spotify:track:${trackId}`],
-        position_ms: chorusStart * 1000
+        position_ms: chorus["start"] * 1000
       }),
       headers: {
         'Authorization': 'Bearer ' + accessToken()
@@ -20,7 +20,7 @@ export function playTrack(trackId, btnElement) {
       success: () => {
         btnElement.classList.replace('btn-success', 'btn-danger')
         btnElement.innerText = "Pause"
-        dance(trackId)
+        dance(trackId, chorus)
       },
       error: () => {
         activateDevices(event)
@@ -44,22 +44,24 @@ export function pauseTrack(btnElement) {
   })
 }
 
-async function findChorusStart(trackId) {
+async function performAudioAnalysis(trackId) {
   try {
-    const response = await $.ajax({
+    return await $.ajax({
       url: `https://api.spotify.com/v1/audio-analysis/${trackId}`,
       headers: {
         'Authorization': 'Bearer ' + accessToken()
       }
     })
-    const sortedByLoudness = response["sections"].sort((a,b) => {
-      return a["loudness"] <= b["loudness"] ? 1 : -1
-    })
-    const chorus = sortedByLoudness[0]
-    return chorus["start"]
   } catch (error) {
     console.log(error)
   }
+}
+
+function findChorus(analysisResponse) {
+  const sortedByLoudness = analysisResponse["sections"].sort((a,b) => {
+    return a["loudness"] <= b["loudness"] ? 1 : -1
+  })
+  return sortedByLoudness[0]
 }
 
 function pauseCurrentlyPlaying() {
@@ -106,15 +108,16 @@ function transferPlayback(event, deviceId) {
   })
 }
 
-function dance(trackId) {
+function dance(trackId, chorus) {
   $.ajax({
     url: `https://api.spotify.com/v1/audio-features/${trackId}`,
     headers: {
       'Authorization': 'Bearer ' + accessToken()
     },
     success: (featuresResponse) => {
-      const gif = calculateGif(featuresResponse)
-      let dancingGif = $('#dancing-gif')
+      const gif = calculateGif(featuresResponse, chorus)
+      console.log('chosen gif: ', gif)
+      const dancingGif = $('#dancing-gif')
       dancingGif.attr("src", gif.url)
       dancingGif.show()
     }
