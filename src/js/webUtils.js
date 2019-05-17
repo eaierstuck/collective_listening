@@ -7,3 +7,8 @@ export function getHashParams() {
   }
   return hashParams
 }
+
+export const accessToken = () => {
+  const params = getHashParams()
+  return params.access_token
+}

@@ -1,7 +1,7 @@
 import {renderPlaylists, renderPlaylistTracks} from './handlebarUtils.js'
-import {getHashParams} from './webUtils.js'
-import calculateGif from './gifs'
 import $ from 'jquery'
+import {playTrack, pauseTrack} from './tracks'
+import {accessToken} from './webUtils'
 
 export function getPlaylists(userId) {
   $.ajax({
@@ -54,104 +54,4 @@ function setUpPlaylistTracks() {
     $('#playlist-tracks').hide()
     $('#playlists').show()
   })
-}
-
-function playTrack(trackId, btnElement) {
-  pauseCurrentlyPlaying()
-
-  $.ajax({
-    url: `https://api.spotify.com/v1/me/player/play`,
-    type: 'PUT',
-    data: JSON.stringify({
-      uris: [`spotify:track:${trackId}`]
-    }),
-    headers: {
-      'Authorization': 'Bearer ' + accessToken()
-    },
-    success: () => {
-      btnElement.classList.replace('btn-success', 'btn-danger')
-      btnElement.innerText = "Pause"
-      dance(trackId)
-    },
-    error: () => {
-      activateDevices(event)
-    }
-  })
-}
-
-function pauseCurrentlyPlaying() {
-  const currentlyPlaying = document.querySelectorAll('.btn-danger')
-  currentlyPlaying.forEach(btn => {
-    pauseTrack(btn)
-  })
-}
-
-function dance(trackId) {
-  $.ajax({
-    url: `https://api.spotify.com/v1/audio-features/${trackId}`,
-    headers: {
-      'Authorization': 'Bearer ' + accessToken()
-    },
-    success: (response) => {
-      const gif = calculateGif(response)
-      $('#dancing-gif').show()
-      $('#dancing-gif').attr("src", gif.url)
-    }
-  })
-}
-
-function activateDevices(event) {
-  $.ajax({
-    url: `https://api.spotify.com/v1/me/player/devices`,
-    headers: {
-      'Authorization': 'Bearer ' + accessToken()
-    },
-    async: false,
-    success: (response) => {
-      const phones = response.devices.filter(d => d.type === "Smartphone")
-      if (phones.length > 0) {
-        transferPlayback(event, phones[0].id)
-      } else if (response.devices.length > 0) {
-        transferPlayback(event, response.devices[0].id)
-      } else {
-        alert('open spotify app!')
-      }
-    }
-  })
-}
-
-function transferPlayback(event, deviceId) {
-  $.ajax({
-    url: `https://api.spotify.com/v1/me/player`,
-    type: 'PUT',
-    data: JSON.stringify({
-      device_ids: [deviceId]
-    }),
-    headers: {
-      'Authorization': 'Bearer ' + accessToken()
-    },
-    success: () => {
-      playTrack(event)
-    }
-  })
-}
-
-function pauseTrack(btnElement) {
-  $.ajax({
-    url: `https://api.spotify.com/v1/me/player/pause`,
-    type: 'PUT',
-    headers: {
-      'Authorization': 'Bearer ' + accessToken()
-    },
-    success: () => {
-      btnElement.classList.replace('btn-danger', 'btn-success')
-      btnElement.innerText = "Play"
-      $('#dancing-gif').hide()
-    }
-  })
-}
-
-const accessToken = () => {
-  const params = getHashParams()
-  return params.access_token
 }

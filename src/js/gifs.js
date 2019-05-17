@@ -2,7 +2,7 @@ import Gif from './gif'
 
 const gifs = [
   new Gif({
-    description: 'swirly fox',
+    description: 'hillary',
     url: 'https://media.giphy.com/media/2lxG3ySjtbpBe/giphy.gif',
     danceability: 1
   }),
@@ -232,13 +232,4 @@ const gifs = [
   }),
 ]
 
-function calculateGif(response) {
-  const danceability = response['danceability']
-  console.log("danceability: ", danceability)
-  if (danceability) {
-    const filteredGifs = gifs.filter(g => g.danceability === Math.floor(danceability * 10))
-    return filteredGifs[Math.floor(Math.random() * filteredGifs.length)]
-  }
-}
-
-export default calculateGif
+export default gifs
